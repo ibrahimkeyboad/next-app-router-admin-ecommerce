@@ -8,13 +8,18 @@ const ProductSchema = new Schema(
     price: { type: Number, required: true },
     images: [{ type: String }],
     category: { type: Schema.Types.ObjectId, ref: Category },
-    properties: { type: Object },
+    properties: {
+      name: {
+        type: String,
+      },
+      values: [{ type: String }],
+    },
   },
   {
     timestamps: true,
   }
 );
 
-const Product = models.Product || model('Product', ProductSchema);
+const Product = models?.Product || model('Product', ProductSchema);
 
 export default Product;

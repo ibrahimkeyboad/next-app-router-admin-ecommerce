@@ -3,9 +3,8 @@ import Product from '@/models/Product';
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
-  console.log('runn');
-  connectDB();
   try {
+    connectDB();
     const products = await Product.find();
     console.log(products);
 

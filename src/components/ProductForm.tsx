@@ -1,3 +1,5 @@
+'use client';
+
 import {
   ChangeEvent,
   FormEvent,
@@ -5,47 +7,31 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Spinner from '@/components/Spinner';
-import { CategoryType, PropertyType } from '../../types';
+import { CategoryType, ProductType, PropertyType } from '../../types';
 
-interface ProductFormProps {
-  _id: string;
-  title: string;
-  description: string;
-  price: string;
-  images: string[];
-  category: CategoryType;
-  properties: PropertyType[];
+interface ProductProps {
+  product: ProductType;
+  categories: CategoryType[];
 }
 
-export default function ProductForm({
-  _id,
-  title: existingTitle,
-  description: existingDescription,
-  price: existingPrice,
-  images: existingImages,
-  category: assignedCategory,
-  properties: assignedProperties,
-}: ProductFormProps) {
-  const [title, setTitle] = useState(existingTitle || '');
-  const [description, setDescription] = useState(existingDescription || '');
-  const [category, setCategory] = useState(assignedCategory || '');
+export default function ProductForm({ product, categories }: ProductProps) {
+  const [title, setTitle] = useState(product.title || '');
+  const [description, setDescription] = useState(product.description || '');
+  const [category, setCategory] = useState(product.category || '');
   const [productProperties, setProductProperties] = useState(
-    assignedProperties || {}
+    product.properties || {}
   );
-  const [price, setPrice] = useState(existingPrice || '');
-  const [images, setImages] = useState<string[]>([]);
+  const [price, setPrice] = useState(product.price || '');
+  const [images, setImages] = useState<string[]>(product.images || []);
   const [goToProducts, setGoToProducts] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [categories, setCategories] = useState<CategoryType[]>([]);
+  const id = product._id;
+  console.log(product.images);
   const router = useRouter();
-  useEffect(() => {
-    axios.get('/api/categories').then((result) => {
-      setCategories(result.data);
-    });
-  }, []);
+
   async function saveProduct(ev: FormEvent<HTMLFormElement>) {
     ev.preventDefault();
     const data = {
@@ -56,9 +42,9 @@ export default function ProductForm({
       category,
       properties: productProperties,
     };
-    if (_id) {
+    if (id) {
       //update
-      await axios.put('/api/products', { ...data, _id });
+      await axios.put('/api/products', { ...data, id });
     } else {
       //create
       await axios.post('/api/products', data);
@@ -126,7 +112,7 @@ export default function ProductForm({
   );
 
   return (
-    <form onSubmit={saveProduct}>
+    <form className='flex flex-col gap-2' onSubmit={saveProduct}>
       <label>Product name</label>
       <input
         type='text'
@@ -207,7 +193,7 @@ export default function ProductForm({
         value={price}
         onChange={(ev) => setPrice(ev.target.value)}
       />
-      <button type='submit' className='btn-primary'>
+      <button type='submit' className='btn-primary self-start'>
         Save
       </button>
     </form>

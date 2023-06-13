@@ -1,11 +1,10 @@
-'use client';
-import getProducts from '@/actions/getProducts';
-import axios from 'axios';
 import Link from 'next/link';
 import React from 'react';
+import { ProductType } from '../../../types';
 
 async function Products() {
-  const products = await getProducts();
+  const res = await fetch('http://localhost:3000/api/products');
+  const products = await res.json();
   return (
     <section>
       <Link href='/products/new' className='bg-gray-300 rounded-md  py-1 px-2'>
@@ -19,7 +18,7 @@ async function Products() {
           </tr>
         </thead>
         <tbody>
-          {products.map((product) => (
+          {products.map((product: ProductType) => (
             <tr key={product._id}>
               <td>{product.title}</td>
               <td>

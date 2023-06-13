@@ -9,7 +9,7 @@ export interface CategoryType {
   parent?: {
     _id: string;
     name: string;
-    properties: PropertyType[];
+    properties?: PropertyType[];
   };
   properties?: PropertyType[];
 }
@@ -34,4 +34,21 @@ export interface OrderType {
   country: string;
   paid: boolean;
   createdAt: Date;
+}
+
+export interface ProductType {
+  _id: any;
+  title: string;
+  description: string;
+  price: number;
+  images: string[];
+  category: CategoryType;
+  properties: PropertyType[];
+}
+
+export interface CategoryDataType {
+  _id?: string;
+  name: string;
+  parent?: string;
+  properties: PropertyType[];
 }
