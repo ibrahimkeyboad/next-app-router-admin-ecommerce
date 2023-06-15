@@ -15,9 +15,9 @@ function Nav() {
   const pathname = usePathname();
 
   const inActiveLink = 'flex gap-1 p-1 items-center';
-  const activeLink = `${inActiveLink} bg-white text-blue-900 rounded-l-md `;
+  const activeLink = `${inActiveLink} bg-highlight text-primary rounded-md `;
   return (
-    <aside className='p-4 pr-0 text-white'>
+    <aside className='p-4 text-gray-500'>
       <Link href='/' className='flex gap-1 items-center pr-3'>
         <HiBuildingStorefront size={25} /> <span>EcommerceAdmin</span>
       </Link>

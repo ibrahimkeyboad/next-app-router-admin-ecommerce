@@ -3,36 +3,44 @@ import { ChangeEvent, FormEvent, useCallback, useState } from 'react';
 import axios from 'axios';
 import { CategoryDataType, CategoryType, PropertyType } from '../../../types';
 
+interface PropertiesData {
+  name: string;
+  values: string;
+}
+
 function CategoryForm({ categories = [] }: { categories: CategoryType[] }) {
   const [editedCategory, setEditedCategory] = useState<CategoryType | null>(
     null
   );
   const [name, setName] = useState('');
   const [parentCategory, setParentCategory] = useState<string | undefined>();
-  const [properties, setProperties] = useState<PropertyType[]>([]);
+  const [properties, setProperties] = useState<PropertiesData[]>([]);
 
-  const saveCategory = useCallback(async (ev: FormEvent<HTMLFormElement>) => {
-    ev.preventDefault();
-    const data: CategoryDataType = {
-      name,
-      parent: parentCategory,
-      properties: properties.map((p) => ({
-        name: p.name,
-        values: p.values.split(','),
-      })),
-    };
-    if (editedCategory) {
-      data._id = editedCategory._id;
-      await axios.put('/api/category', data);
-      setEditedCategory(null);
-    } else {
-      console.log(data);
-      await axios.post('/api/category', data);
-    }
-    setName('');
-    setParentCategory('');
-    setProperties([]);
-  }, []);
+  const saveCategory = useCallback(
+    async (ev: FormEvent<HTMLFormElement>) => {
+      ev.preventDefault();
+      const data: CategoryDataType = {
+        name,
+        parent: parentCategory,
+        properties: properties.map((p) => ({
+          name: p.name,
+          values: p.values.split(','),
+        })),
+      };
+      if (editedCategory) {
+        data._id = editedCategory._id;
+        await axios.put('/api/category', data);
+        setEditedCategory(null);
+      } else {
+        console.log(data);
+        await axios.post('/api/category', data);
+      }
+      setName('');
+      setParentCategory('');
+      setProperties([]);
+    },
+    [editedCategory, name, parentCategory, properties]
+  );
 
   const editCategory = useCallback((category: CategoryType) => {
     setEditedCategory(category);
@@ -48,51 +56,38 @@ function CategoryForm({ categories = [] }: { categories: CategoryType[] }) {
       );
     }
   }, []);
-  function deleteCategory(category: CategoryType) {
-    // swal
-    //   .fire({
-    //     title: 'Are you sure?',
-    //     text: `Do you want to delete ${category.name}?`,
-    //     showCancelButton: true,
-    //     cancelButtonText: 'Cancel',
-    //     confirmButtonText: 'Yes, Delete!',
-    //     confirmButtonColor: '#d55',
-    //     reverseButtons: true,
-    //   })
-    //   .then(async (result: any) => {
-    //     if (result.isConfirmed) {
-    //       const { _id } = category;
-    //       await axios.delete('/api/categories?_id=' + _id);
-    //     }
-    //   });
-  }
+
   const addProperty = useCallback(() => {
-    setProperties([...properties, { name: '', values: [''] }]);
-  }, [properties]);
+    setProperties((prev) => {
+      return [...prev, { name: '', values: '' }];
+    });
+  }, []);
 
   const handlePropertyNameChange = useCallback(
-    (index: number, event: ChangeEvent<HTMLInputElement>) => {
-      const { name, value } = event.target;
-      const updatedProperties = [...properties];
-      updatedProperties[index] = { ...updatedProperties[index], [name]: value };
-      setProperties(updatedProperties);
+    (index: number, newName: string) => {
+      setProperties((prev) => {
+        const updatedProperties = [...prev];
+        updatedProperties[index].name = newName;
+        return updatedProperties;
+      });
     },
-    [properties]
+    []
   );
 
   const handlePropertyValuesChange = useCallback(
-    (index: number, event: ChangeEvent<HTMLInputElement>) => {
-      const { value } = event.target;
-      const updatedProperties = [...properties];
-      updatedProperties[index].values[valueIndex] = value;
-      setProperties(updatedProperties);
+    (index: number, newValues: string) => {
+      setProperties((prev) => {
+        const updatedProperties = [...prev];
+        updatedProperties[index].values = newValues;
+        return updatedProperties;
+      });
     },
-    [properties]
+    []
   );
 
   const removeProperty = useCallback((indexToRemove: number) => {
     setProperties((prev) => {
-      return [...prev].filter((p, pIndex) => {
+      return [...prev].filter((_, pIndex) => {
         return pIndex !== indexToRemove;
       });
     });
@@ -141,7 +136,9 @@ function CategoryForm({ categories = [] }: { categories: CategoryType[] }) {
                   type='text'
                   value={property.name}
                   className='mb-0'
-                  onChange={(ev) => handlePropertyNameChange(index, ev)}
+                  onChange={(ev) =>
+                    handlePropertyNameChange(index, ev.target.value)
+                  }
                   placeholder='property name (example: color)'
                 />
                 <input
@@ -202,11 +199,11 @@ function CategoryForm({ categories = [] }: { categories: CategoryType[] }) {
                       className='btn-default mr-1'>
                       Edit
                     </button>
-                    <button
+                    {/* <button
                       onClick={() => deleteCategory(category)}
                       className='btn-red'>
                       Delete
-                    </button>
+                    </button> */}
                   </td>
                 </tr>
               ))}

@@ -2,9 +2,15 @@ import Link from 'next/link';
 import React from 'react';
 import { ProductType } from '../../../types';
 
+async function getProducts() {
+  const res = await fetch('http://localhost:3000/api/products', {
+    next: { revalidate: 10 },
+  });
+  return res.json();
+}
+
 async function Products() {
-  const res = await fetch('http://localhost:3000/api/products');
-  const products = await res.json();
+  const products = await getProducts();
   return (
     <section>
       <Link href='/products/new' className='bg-gray-300 rounded-md  py-1 px-2'>

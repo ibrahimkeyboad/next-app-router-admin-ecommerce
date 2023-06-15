@@ -1,16 +1,11 @@
 'use client';
 
-import {
-  ChangeEvent,
-  FormEvent,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import { ChangeEvent, FormEvent, useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Spinner from '@/components/Spinner';
 import { CategoryType, ProductType, PropertyType } from '../../types';
+import Image from 'next/image';
 
 interface ProductProps {
   product: ProductType;
@@ -20,7 +15,7 @@ interface ProductProps {
 export default function ProductForm({ product, categories }: ProductProps) {
   const [title, setTitle] = useState(product.title || '');
   const [description, setDescription] = useState(product.description || '');
-  const [category, setCategory] = useState(product.category || '');
+  const [category, setCategory] = useState<string>(product.category.name || '');
   const [productProperties, setProductProperties] = useState(
     product.properties || {}
   );
@@ -121,7 +116,7 @@ export default function ProductForm({ product, categories }: ProductProps) {
         onChange={(ev) => setTitle(ev.target.value)}
       />
       <label>Category</label>
-      <select value={category.name} onChange={setCategoryHandler}>
+      <select value={category} onChange={setCategoryHandler}>
         <option value=''>Uncategorized</option>
         {categories.length > 0 &&
           categories.map((c) => (
@@ -153,8 +148,8 @@ export default function ProductForm({ product, categories }: ProductProps) {
           images.map((link) => (
             <div
               key={link}
-              className='h-24 bg-white p-4 shadow-sm rounded-sm border border-gray-200'>
-              <img src={link} alt='' className='rounded-lg' />
+              className='h-24 relative bg-white p-4 shadow-sm rounded-sm border border-gray-200'>
+              <Image fill src={link} alt='' className='rounded-lg' />
             </div>
           ))}
         {isUploading && (
